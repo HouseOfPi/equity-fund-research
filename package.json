@@ -1,0 +1,30 @@
+{
+  "name": "smallcap-observatory",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"node --watch server/index.js\" \"vite --host 0.0.0.0\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test",
+    "setup": "node server/setup.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "pg": "^8.23.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "vite": "^6.1.0"
+  }
+}
