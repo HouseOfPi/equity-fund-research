@@ -1,27 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
+import Modal from "./Modal.jsx";
+import { useSortedRows, SortButton, SortHeading } from "./sorting.jsx";
 import { api, monthLabel, number, pct, prev } from "./utils.js";
+export const alphabetical = (a, b) => a.localeCompare(b, "en", { sensitivity: "base", numeric: true });
+export function PortfolioSearch({ id, label, value, onChange, count, total, noun, disabled = false }) {
+  return <div className="portfolio-search">
+    <div className="portfolio-search-field">
+      <label className="visually-hidden" htmlFor={id}>{label}</label>
+      <input id={id} type="search" placeholder={label + "…"} value={value} onChange={(event) => onChange(event.target.value)} disabled={disabled} aria-describedby={id + "-results"} />
+    </div>
+    {value && <button disabled={disabled} onClick={() => onChange("")} aria-label={"Clear " + label.toLowerCase()}>Clear</button>}
+    <span id={id + "-results"} className={value.trim() ? "fine" : "visually-hidden"} aria-live="polite" aria-atomic="true">{value.trim() ? `${count} of ${total} ${noun}` : ""}</span>
+  </div>;
+}
 export function Logo() {
   return (
     <span className="logo" aria-hidden="true">
-      ◉
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 4v16h16M8 16v-4m5 4V8m5 8V5" strokeLinecap="round" /></svg>
     </span>
   );
 }
 export function Login({ onLogin }) {
   const [password, set] = useState(""),
     [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [visible, setVisible] = useState(false);
   return (
     <main className="login">
       <div className="login-card">
-        <Logo />
-        <p className="eyebrow">MONTHLY PORTFOLIO INTELLIGENCE</p>
-        <h1>
-          Smallcap
-          <br />
-          Observatory<span className="accent">.</span>
-        </h1>
-        <p className="muted">A clearer view of Indian small-cap funds.</p>
+        <div className="brand login-brand"><Logo /><span>Smallcap<small>OBSERVATORY</small></span></div>
+        <h1>Your fund dashboard</h1>
+        <p className="muted">Enter your password to view the funds.</p>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -41,17 +50,17 @@ export function Login({ onLogin }) {
           }}
         >
           <label htmlFor="password">Password</label>
-          <input
+          <div className="password-field"><input
             id="password"
-            type="password"
+            type={visible ? "text" : "password"}
             value={password}
             onChange={(e) => set(e.target.value)}
             autoComplete="current-password"
             required
             autoFocus
-          />
+          /><button type="button" onClick={() => setVisible((v) => !v)} aria-label={visible ? "Hide password" : "Show password"}>{visible ? "Hide" : "Show"}</button></div>
           <button className="primary" disabled={busy}>
-            {busy ? "Signing in…" : "Enter observatory →"}
+            {busy ? "Signing in…" : "Sign in →"}
           </button>
           {error && (
             <p role="alert" className="error">
@@ -148,6 +157,7 @@ const filters = {
 };
 function Analysis({ analysis, month }) {
   const [filter, setFilter] = useState("All changes");
+  const sorting = useSortedRows(analysis.pending ? [] : analysis.rows.filter(filters[filter]));
   if (analysis.pending)
     return (
       <section>
@@ -166,7 +176,7 @@ function Analysis({ analysis, month }) {
         </p>
       </section>
     );
-  const rows = analysis.rows.filter(filters[filter]);
+  const rows = sorting.rows;
   return (
     <section>
       <h3>Whole-portfolio comparison</h3>
@@ -202,16 +212,11 @@ function Analysis({ analysis, month }) {
           <thead>
             <tr>
               {[
-                "Company",
-                "Movement",
-                "Previous shares",
-                "Current shares",
-                "Net shares",
-                "Share change",
-                "Current weight",
-              ].map((s) => (
-                <th key={s}>{s}</th>
-              ))}
+                { key: "company", label: "Company" }, { key: "movement", label: "Movement" },
+                { key: "previousQuantity", label: "Previous shares" }, { key: "currentQuantity", label: "Current shares" },
+                { key: "net", label: "Net shares" }, { key: "percent", label: "Share change" },
+                { key: "allocation", label: "Current weight" },
+              ].map((column) => <SortHeading key={column.key} column={column} sorting={sorting} />)}
             </tr>
           </thead>
           <tbody>
@@ -273,12 +278,16 @@ function Analysis({ analysis, month }) {
   );
 }
 function HoldingList({ fund }) {
-  return fund.top.length ? (
+  const sorting = useSortedRows(fund.top.map((holding, index) => ({ ...holding, rank: index + 1 })), { key: "allocation", direction: "descending" });
+  return fund.top.length ? (<>
+    <div className="holding-sort" role="group" aria-label={`Sort holdings for ${fund.name}`}>
+      {[{ key: "rank", label: "Rank" }, { key: "company", label: "Company" }, { key: "allocation", label: "Weight" }, { key: "allocationChange", label: "Weight change" }].map((column) => <SortButton key={column.key} column={column} sorting={sorting} />)}
+    </div>
     <ol className="holdings">
-      {fund.top.map((h, i) => (
+      {sorting.rows.map((h) => (
         <li key={h.companyId}>
           <span className="holding-name">
-            <span className="rank">{i + 1}</span>
+            <span className="rank">{h.rank}</span>
             {h.company}
           </span>
           <span className="holding-value">
@@ -290,13 +299,13 @@ function HoldingList({ fund }) {
                 {h.allocationChange >= 0 ? "+" : ""}
                 {h.allocationChange.toFixed(2)} pp
               </small>
-            ) : h.newTopFive ? (
-              <small>New to top 5</small>
+            ) : h.newTop15 ? (
+              <small>New to top 15</small>
             ) : null}
           </span>
         </li>
       ))}
-    </ol>
+    </ol></>
   ) : (
     <div className="pending-holdings">
       <span className="pending-icon">◷</span>
@@ -305,163 +314,45 @@ function HoldingList({ fund }) {
     </div>
   );
 }
-function FundDetails({ fund, panels, close, month }) {
-  return (
-    <div className="fund-details">
-      <div className="details-top">
-        <span className="eyebrow">RESEARCH DETAILS</span>
-        <button onClick={() => close(false)}>Minimize ↑</button>
-      </div>
-      {panels.analysis && <Analysis analysis={fund.analysis} month={month} />}{" "}
-      {panels.sources && <Sources snapshot={fund.snapshot} />}
-      <button className="bottom-minimize" onClick={() => close(true)}>
-        Minimize & return to fund ↑
-      </button>
-    </div>
-  );
+function FundDialog({ fund, panel, month, onClose }) {
+  return <Modal id="fund-dialog" title={panel === "analysis" ? "Fund analysis" : "Fund sources"} subtitle={fund.name} closeLabel="Close fund popup" onClose={onClose}>{panel === "analysis" ? <Analysis analysis={fund.analysis} month={month} /> : <Sources snapshot={fund.snapshot} />}</Modal>;
 }
 export function FundListing({ funds, view, month }) {
-  const [expanded, setExpanded] = useState({});
-  const headers = useRef({});
-  useEffect(() => setExpanded({}), [month, view]);
-  function toggle(id, p) {
-    setExpanded((e) => ({ ...e, [id]: { ...e[id], [p]: !e[id]?.[p] } }));
-  }
-  function close(id, bottom) {
-    setExpanded((e) => ({ ...e, [id]: {} }));
-    if (bottom)
-      requestAnimationFrame(() => {
-        headers.current[id]?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-        headers.current[id]?.focus({ preventScroll: true });
-      });
-  }
-  const controls = (f) => (
-    <div className="fund-actions">
-      <button
-        aria-expanded={!!expanded[f.id]?.analysis}
-        onClick={() => toggle(f.id, "analysis")}
-      >
-        ↗ Analysis
-      </button>
-      <button
-        aria-expanded={!!expanded[f.id]?.sources}
-        onClick={() => toggle(f.id, "sources")}
-      >
-        ↗ Sources
-      </button>
+  const [popup, setPopup] = useState(null);
+  const sorting = useSortedRows(funds.map((fund) => ({ ...fund,
+    totalAllocation: fund.top.length ? fund.top.reduce((sum, holding) => sum + holding.allocation, 0) : null,
+    disclosureDate: fund.snapshot?.disclosureDate ?? null,
+    topCompany: fund.top[0]?.company ?? null,
+  })), { key: "name", direction: "ascending" });
+  const fundColumns = [{ key: "serialNumber", label: "Number" }, { key: "name", label: "Fund" }, { key: "disclosureDate", label: "Disclosure date" }, { key: "totalAllocation", label: "Combined weight" }, { key: "topCompany", label: "Top company" }];
+  const selected = popup && funds.find((fund) => fund.id === popup.id);
+  const controls = (fund) => <div className="fund-actions">
+    <button aria-haspopup="dialog" aria-controls="fund-dialog" onClick={() => setPopup({ id: fund.id, panel: "analysis" })}>↗ Analysis</button>
+    <button aria-haspopup="dialog" aria-controls="fund-dialog" onClick={() => setPopup({ id: fund.id, panel: "sources" })}>↗ Sources</button>
+  </div>;
+  const title = (fund) => <>
+    <div className="fund-title-line"><span className="fund-serial" aria-label={`Fund number ${fund.serialNumber}`}>{fund.serialNumber}.</span><h3>{fund.name}</h3></div>
+    <div className="fund-date">{fund.snapshot ? "Disclosure as of " + fund.snapshot.disclosureDate : "Disclosure unavailable"}
+      {fund.snapshot && <span className={fund.snapshot.verification === "official" ? "verified badge" : "warning badge"}>{fund.snapshot.verification === "official" ? "Official evidence" : "Needs review"}</span>}
     </div>
-  );
-  const title = (f) => (
-    <>
-      <h3 tabIndex="-1" ref={(el) => (headers.current[f.id] = el)}>
-        {f.name}
-      </h3>
-      <div className="fund-date">
-        {f.snapshot
-          ? "Disclosure as of " + f.snapshot.disclosureDate
-          : "Disclosure unavailable"}
-        {f.snapshot && (
-          <span
-            className={
-              f.snapshot.verification === "official"
-                ? "verified badge"
-                : "warning badge"
-            }
-          >
-            {f.snapshot.verification === "official"
-              ? "Official evidence"
-              : "Needs review"}
-          </span>
-        )}
-      </div>
-    </>
-  );
-  const total = (f) =>
-    f.top.length ? pct(f.top.reduce((n, h) => n + h.allocation, 0)) : "—";
-  return view === "cards" ? (
-    <div className="fund-grid">
-      {funds.map((f, i) => {
-        const open = expanded[f.id]?.analysis || expanded[f.id]?.sources;
-        return (
-          <article
-            className={"fund-card " + (open ? "expanded" : "")}
-            key={f.id}
-          >
-            <div className="fund-card-head">
-              <span className={"fund-mark mark-" + (i % 4)}>
-                {f.name
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((w) => w[0])
-                  .join("")}
-              </span>
-              <div>{title(f)}</div>
-            </div>
-            <HoldingList fund={f} />
-            <div className="fund-footer">
-              <div>
-                <span>Combined top five</span>
-                <b>{total(f)}</b>
-              </div>
-              {controls(f)}
-            </div>
-            {open && (
-              <FundDetails
-                fund={f}
-                panels={expanded[f.id]}
-                close={(bottom) => close(f.id, bottom)}
-                month={month}
-              />
-            )}
-          </article>
-        );
-      })}
-    </div>
-  ) : (
-    <div className="table-scroll fund-table-wrap">
-      <table className="fund-table">
-        <thead>
-          <tr>
-            <th>Fund & disclosure</th>
-            <th>Top five companies · % of net assets</th>
-            <th>Combined</th>
-            <th>Research</th>
-          </tr>
-        </thead>
-        <tbody>
-          {funds.map((f) => (
-            <React.Fragment key={f.id}>
-              <tr>
-                <td>{title(f)}</td>
-                <td>
-                  <HoldingList fund={f} />
-                </td>
-                <td className="numeric">
-                  <b>{total(f)}</b>
-                </td>
-                <td>{controls(f)}</td>
-              </tr>
-              {(expanded[f.id]?.analysis || expanded[f.id]?.sources) && (
-                <tr>
-                  <td colSpan="4">
-                    <FundDetails
-                      fund={f}
-                      panels={expanded[f.id]}
-                      close={(bottom) => close(f.id, bottom)}
-                      month={month}
-                    />
-                  </td>
-                </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  </>;
+  const total = (fund) => fund.top.length ? pct(fund.top.reduce((sum, holding) => sum + holding.allocation, 0)) : "—";
+  return <>
+    {view === "cards" && <div className="list-sort" role="group" aria-label="Sort funds">{fundColumns.map((column) => <SortButton key={column.key} column={column} sorting={sorting} />)}</div>}
+    {view === "cards" ? <div className="fund-grid">{sorting.rows.map((fund) => <article className="fund-card" key={fund.id}>
+      <div className="fund-card-head"><div>{title(fund)}</div></div>
+      <HoldingList fund={fund} />
+      <div className="fund-footer"><div><span>Combined top 15</span><b>{total(fund)}</b></div>{controls(fund)}</div>
+    </article>)}</div> : <div className="table-scroll fund-table-wrap"><table className="fund-table">
+      <thead><tr><th scope="col" aria-sort={["serialNumber", "name", "disclosureDate"].includes(sorting.sort.key) ? sorting.sort.direction : "none"}><div className="list-sort">{fundColumns.slice(0, 3).map((column) => <SortButton key={column.key} column={column} sorting={sorting} />)}</div></th><SortHeading column={fundColumns[4]} sorting={sorting} /><SortHeading column={fundColumns[3]} sorting={sorting} /><th>Research</th></tr></thead>
+      <tbody>{sorting.rows.map((fund) => <tr key={fund.id}><td>{title(fund)}</td><td><HoldingList fund={fund} /></td><td className="numeric"><b>{total(fund)}</b></td><td>{controls(fund)}</td></tr>)}</tbody>
+    </table></div>}
+    {selected && <FundDialog key={`${selected.id}:${popup.panel}`} fund={selected} panel={popup.panel} month={month} onClose={() => setPopup(null)} />}
+  </>;
+}
+function SharedEntries({ entries }) {
+  const sorting = useSortedRows(entries, { key: "name", direction: "ascending" });
+  return <><div className="list-sort" role="group" aria-label="Sort shared fund allocations">{[{ key: "name", label: "Fund" }, { key: "allocation", label: "Weight" }].map((column) => <SortButton key={column.key} column={column} sorting={sorting} />)}</div>{sorting.rows.map((entry) => <div className="shared-entry" key={entry.name}><span>{entry.name}</span><b>{pct(entry.allocation)}</b></div>)}</>;
 }
 export function Shared({ funds }) {
   const groups = new Map();
@@ -479,12 +370,10 @@ export function Shared({ funds }) {
     }
   const shared = [...groups.values()]
     .filter((g) => g.entries.length > 1)
-    .sort(
-      (a, b) =>
-        b.entries.length - a.entries.length ||
-        a.company.localeCompare(b.company),
-    );
-  const [open, setOpen] = useState({});
+    .sort((a, b) => alphabetical(a.company, b.company));
+  const [open, setOpen] = useState({}), [search, setSearch] = useState("");
+  const matching = shared.filter((group) => group.company.toLowerCase().includes(search.trim().toLowerCase()));
+  const sorting = useSortedRows(matching.map((group) => ({ ...group, fundCount: group.entries.length })), { key: "company", direction: "ascending" });
   const refs = useRef({});
   function close(id, bottom) {
     setOpen((s) => ({ ...s, [id]: false }));
@@ -498,21 +387,14 @@ export function Shared({ funds }) {
       });
   }
   return (
-    <section className="shared-section">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">WHERE PORTFOLIOS MEET</p>
-          <h2>Shared holdings</h2>
-        </div>
-        <span className="pill">Top five only</span>
+    <details className="shared-section section-disclosure"><summary>Shared holdings</summary><div className="disclosure-body">
+      <div className="shared-toolbar"><p className="fine">Companies shared by funds’ top 15 holdings</p>
+        <div className="list-sort" role="group" aria-label="Sort shared companies">{[{ key: "company", label: "Company" }, { key: "fundCount", label: "Funds" }].map((column) => <SortButton key={column.key} column={column} sorting={sorting} />)}</div>
+        <PortfolioSearch id="shared-search" label="Search shared companies" value={search} onChange={setSearch} count={matching.length} total={shared.length} noun="companies" />
       </div>
-      <p className="muted">
-        Companies appearing in more than one fund’s top five. This is not a
-        full-portfolio overlap comparison.
-      </p>
-      {shared.length ? (
+      {matching.length ? (
         <div className="shared-grid">
-          {shared.map((g) => (
+          {sorting.rows.map((g) => (
             <article className="shared-card" key={g.id}>
               <button
                 className="shared-header"
@@ -529,14 +411,7 @@ export function Shared({ funds }) {
               {open[g.id] && (
                 <div className="shared-content">
                   <button onClick={() => close(g.id, false)}>Minimize ↑</button>
-                  {g.entries
-                    .sort((a, b) => b.allocation - a.allocation)
-                    .map((e) => (
-                      <div className="shared-entry" key={e.name}>
-                        <span>{e.name}</span>
-                        <b>{pct(e.allocation)}</b>
-                      </div>
-                    ))}
+                  <SharedEntries entries={g.entries} />
                   <button onClick={() => close(g.id, true)}>
                     Minimize & return ↑
                   </button>
@@ -545,11 +420,13 @@ export function Shared({ funds }) {
             </article>
           ))}
         </div>
+      ) : shared.length ? (
+        <div className="empty-panel"><b>No shared companies match your search</b><p>Try another company name or clear the search.</p></div>
       ) : (
         <div className="empty-panel">
           <b>
             {funds.some((f) => f.top.length)
-              ? "No shared top-five holdings"
+              ? "No shared top-15 holdings"
               : "Shared holdings pending"}
           </b>
           <p>
@@ -558,95 +435,6 @@ export function Shared({ funds }) {
           </p>
         </div>
       )}
-    </section>
-  );
-}
-export function Updater() {
-  const [token, setToken] = useState(""),
-    [text, setText] = useState(""),
-    [result, setResult] = useState(""),
-    [busy, setBusy] = useState(false),
-    [history, setHistory] = useState([]);
-  useEffect(() => {
-    api("/history")
-      .then(setHistory)
-      .catch(() => {});
-  }, []);
-  async function run(type) {
-    setBusy(true);
-    setResult("");
-    try {
-      let body;
-      if (type === "import") body = JSON.stringify(JSON.parse(text));
-      const r = await api("/updater/" + type, {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token },
-        body,
-      });
-      setResult("Successful " + type + ". " + JSON.stringify(r));
-      setHistory(await api("/history"));
-    } catch (e) {
-      setResult(e.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <section className="updater">
-      <h2>Disclosure updater</h2>
-      <p className="muted">
-        Viewer sessions cannot change holdings. A separate server-configured
-        updater token is required. Credentials are kept in memory only.
-      </p>
-      <label>
-        Updater token
-        <input
-          type="password"
-          autoComplete="off"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-        />
-      </label>
-      <label>
-        Monthly snapshot JSON
-        <textarea
-          rows="10"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder='{"note":"Validated official disclosure","snapshots":[…]}'
-        />
-      </label>
-      <div className="toolbar">
-        <button
-          className="primary"
-          disabled={busy || !token || !text}
-          onClick={() => run("import")}
-        >
-          Validate & import
-        </button>
-        <button disabled={busy || !token} onClick={() => run("check")}>
-          Check configured source
-        </button>
-      </div>
-      {result && (
-        <p role="status" className="notice">
-          {result}
-        </p>
-      )}
-      <h3>Update history</h3>
-      {history.length ? (
-        history.map((h, i) => (
-          <div className="history-row" key={i}>
-            <b>{h.result}</b>
-            <span>
-              {h.at} · {h.note}
-            </span>
-            <small>{h.changes?.length ?? 0} material snapshot changes</small>
-          </div>
-        ))
-      ) : (
-        <p className="muted">No updates recorded.</p>
-      )}
-    </section>
+    </div></details>
   );
 }

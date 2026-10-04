@@ -1,0 +1,404 @@
+[
+  {
+    "fundId": "01",
+    "month": "2026-08",
+    "url": "https://mf.nipponindiaim.com/InvestorServices/FactsheetsDocuments/NIMF-MONTHLY-PORTFOLIO-31-Aug-26.xls",
+    "sheet": "SC"
+  },
+  {
+    "fundId": "02",
+    "month": "2026-08",
+    "url": "https://www.dspim.com/media/pages/mandatory-disclosures/portfolio-disclosures/8a6dbe504f-1789452169/dsp-monthend-portfolio-as-on-31-aug-2026.zip",
+    "member": "DSP EquityFOF ISIN Portfolio as on 31 Aug 2026.xlsx",
+    "sheet": "SMALLCAP"
+  },
+  {
+    "fundId": "03",
+    "month": "2026-08",
+    "url": "https://www.invescomutualfund.com/docs/default-source/completes-monthly-holding/small-cap.xlsx?sfvrsn=7d249fc2_0",
+    "sheet": "Small cap"
+  },
+  {
+    "fundId": "04",
+    "month": "2026-08",
+    "url": "https://www.motilaloswalmf.com/content/dam/motilal-mf/sheets/fund-csvs/Month_End_Portfolio_August_2026/YO46.xlsx",
+    "sheet": "YO46"
+  },
+  {
+    "fundId": "06",
+    "month": "2026-08",
+    "url": "https://mutualfund.adityabirlacapital.com/-/media/bsl/files/resources/monthly-portfolio/2026/monthly-portfolio-31082026_abslmf.zip",
+    "member": "31082026_ABSLMF_MonthlyDisclosure.xls",
+    "sheet": "BSLTA1"
+  },
+  {
+    "fundId": "07",
+    "month": "2026-08",
+    "url": "https://www.miraeassetmf.co.in/docs/default-source/portfolios/mascf_aug2026.xlsx",
+    "sheet": "MASCF"
+  },
+  {
+    "fundId": "08",
+    "month": "2026-08",
+    "url": "https://cms.mahindramanulife.com/storage/mmimplweb/uploads/download/ec5032da-3319-40f3-8e54-770bebae0ff1.xlsx",
+    "sheet": "MMF21",
+    "cashAggregate": {
+      "label": "Net Receivables / (Payables)",
+      "components": [
+        "Margin placed with CCIL & ARCL"
+      ]
+    }
+  },
+  {
+    "fundId": "09",
+    "month": "2026-08",
+    "url": "https://d3ce1o48hc5oli.cloudfront.net/s3fs-public/2026-09/fw_uti_mf_scheme_portfolios_31.08.2026_revised_final.zip?VersionId=EhSzHSoKCBkh0BsN76FmUi65sUKxPLs9",
+    "member": "Sebi Exposure as on 31 Aug 2026_final_REVISED.xlsx",
+    "sheet": "EXPOSURE",
+    "layout": "uti-consolidated"
+  },
+  {
+    "fundId": "10",
+    "month": "2026-08",
+    "url": "https://www.sundarammutual.com/uploaddir/MonthlyPortfolio/monthlyportfolio_100926103707.xlsx",
+    "sheet": "SMILE",
+    "missingIsinNames": [
+      "GSPL Transmission Ltd"
+    ]
+  },
+  {
+    "fundId": "11",
+    "month": "2026-08",
+    "url": "https://itiamc.com/admin/pdf/1789047128-IN_MF_MONTHLY_PORTFOLIO_AUGUST_2026.xlsx",
+    "sheet": "ITISCF"
+  },
+  {
+    "fundId": "12",
+    "month": "2026-08",
+    "url": "https://trustmf.com/Content/2026/9/Monthly%20Port_20260909123835.xlsx",
+    "sheet": "TMFSCAP"
+  },
+  {
+    "fundId": "13",
+    "month": "2026-08",
+    "url": "https://www.abakkusmf.com/uploads/Portfolio_Aug31_Monthly_a00d994a66.xls",
+    "sheet": "ABASC"
+  },
+  {
+    "fundId": "14",
+    "month": "2026-08",
+    "url": "https://media.bajajamc.com/wp-content/uploads/2026/09/Bajaj-Finserv-Mutual-Fund_Monthly-Portfolio-as-on-31-Aug-2026.xls",
+    "sheet": "BFSMALL"
+  },
+  {
+    "fundId": "15",
+    "month": "2026-08",
+    "url": "https://www.pgimindia.com/api/v1/brochure/about-us/image/PGIM%20INDIA%20SMALL%20CAP%20FUND%20Aug%202026.xlsx",
+    "sheet": "Small Cap"
+  },
+  {
+    "fundId": "16",
+    "month": "2026-08",
+    "url": "https://www.heliosmf.in/wp-content/uploads/2026/09/helios-small-cap-fund-monthly-portfolio-as-on-31st-august-2026.xlsx",
+    "sheet": "HSCF"
+  },
+  {
+    "fundId": "17",
+    "month": "2026-08",
+    "url": "https://www.jmfinancialmf.com/CMS/downloads/Portfolio%20Disclosure/Monthly%20Portfolio%20of%20Schemes/Monthly%20Portfolio%20-%20JM%20Small%20Cap%20Fund%20-%20Aug%2031,%202026.xlsx",
+    "sheet": "JM Small Cap Fund"
+  },
+  {
+    "fundId": "18",
+    "month": "2026-08",
+    "url": "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/8/LEESCF09-09-2026-09:58:30.xlsx",
+    "sheet": "LEESCF"
+  },
+  {
+    "fundId": "19",
+    "month": "2026-08",
+    "url": "https://assets-netstorage.growwmf.in/compliance_docs/Statutory%20Disclosure/Portfolio/2026%20-2027/Monthly%20Portfolio-%20Aug%2031%202026.xlsx",
+    "sheet": "IB60"
+  },
+  {
+    "fundId": "20",
+    "month": "2026-08",
+    "url": "https://www.quantumamc.com/FileCDN/FactSheet/f616b3fb-f263-439d-81da-d4663a287aed.xlsx",
+    "sheet": "QSCAPF"
+  },
+  {
+    "fundId": "02",
+    "month": "2026-07",
+    "url": "https://www.dspim.com/media/pages/mandatory-disclosures/portfolio-disclosures/081d3fbd38-1789152732/monthend-portfolios_31_july_2026.zip",
+    "sheet": "SMALLCAP",
+    "member": "DSP Equity FOF ISIN Portfolio as on 31 Jul 2026.xlsx"
+  },
+  {
+    "fundId": "07",
+    "month": "2026-07",
+    "url": "https://www.miraeassetmf.co.in/docs/default-source/portfolios/mascf-july2026.xlsx",
+    "sheet": "MASCF"
+  },
+  {
+    "fundId": "08",
+    "month": "2026-07",
+    "url": "https://cms.mahindramanulife.com/storage/mmimplweb/uploads/download/592b0e39-1e0d-41d7-b0ef-c7fefecf9e2a.xlsx",
+    "sheet": "MMF21",
+    "cashAggregate": {
+      "label": "Net Receivables / (Payables)",
+      "components": [
+        "Margin placed with CCIL & ARCL"
+      ]
+    }
+  },
+  {
+    "fundId": "12",
+    "month": "2026-07",
+    "url": "https://trustmf.com/Content/2026/9/Monthly%20Port_20260909133513.xlsx",
+    "sheet": "TMFSCAP"
+  },
+  {
+    "fundId": "20",
+    "month": "2026-07",
+    "url": "https://www.quantumamc.com/FileCDN/FactSheet/d701fe6a-e00f-4291-a9f3-47e40f4946da.xlsx",
+    "sheet": "QSCAPF"
+  },
+  {
+    "fundId": "03",
+    "month": "2026-07",
+    "url": "https://www.invescomutualfund.com/docs/default-source/completes-monthly-holding/smallcap1d1dfe07eee8616aaa28ff00007d74af.xlsx?sfvrsn=6f59fc2_0",
+    "sheet": "Smallcap"
+  },
+  {
+    "fundId": "01",
+    "url": "https://mf.nipponindiaim.com/InvestorServices/FactsheetsDocuments/NIMF-MONTHLY-PORTFOLIO-31-July-26.xls",
+    "sheet": "SC",
+    "month": "2026-07"
+  },
+  {
+    "fundId": "06",
+    "url": "https://mutualfund.adityabirlacapital.com/-/media/bsl/files/resources/monthly-portfolio/2026/absl_monthly_portfolio_report_july--2026.zip",
+    "sheet": "BSLTA1",
+    "month": "2026-07",
+    "member": "ABSL_Monthly_Portfolio_Report_July 2026.xls"
+  },
+  {
+    "fundId": "15",
+    "url": "https://www.pgimindia.com/api/v1/brochure/about-us/image/PGIM%20INDIA%20SMALL%20CAP%20FUND%20%20Jul%202026.xlsx",
+    "sheet": "Small Cap",
+    "month": "2026-07"
+  },
+  {
+    "fundId": "10",
+    "month": "2026-07",
+    "url": "https://www.sundarammutual.com/uploaddir/MonthlyPortfolio/monthlyportfolio_100826111829.xlsx",
+    "sheet": "SMILE",
+    "missingIsinNames": [
+      "GSPL Transmission Ltd"
+    ]
+  },
+  {
+    "fundId": "11",
+    "url": "https://itiamc.com/admin/pdf/1786348598-ITIMF_Monthly_Portfolio_31.07.2026.xlsx",
+    "sheet": "ITISCF",
+    "month": "2026-07"
+  },
+  {
+    "fundId": "13",
+    "url": "https://www.abakkusmf.com/uploads/Final_Monthly_Portfolio_Jul_31_a313e9e6dd.xls",
+    "sheet": "ABASC",
+    "month": "2026-07"
+  },
+  {
+    "fundId": "18",
+    "url": "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/7/LEESCF07-08-2026-11:04:34.xlsx",
+    "sheet": "LEESCF",
+    "month": "2026-07"
+  },
+  {
+    "fundId": "09",
+    "url": "https://d3ce1o48hc5oli.cloudfront.net/s3fs-public/2026-08/fw_uti_mf_scheme_portfolios_31.07.2026.zip?VersionId=0YOO81aEKLNeoGrkyasPFrk7OMuekOTl",
+    "sheet": "exposure",
+    "layout": "uti-consolidated",
+    "month": "2026-07",
+    "member": "Sebi Exposure as on 31 Jul 2026_final.xlsx"
+  },
+  {
+    "fundId": "17",
+    "month": "2026-07",
+    "url": "https://www.jmfinancialmf.com/CMS/downloads/Portfolio%20Disclosure/Monthly%20Portfolio%20of%20Schemes/Monthly%20Portfolio%20-%20JM%20Small%20Cap%20Fund%20-%20July%2031,%202026.xlsx",
+    "sheet": "JM Small Cap Fund"
+  },
+  {
+    "fundId": "19",
+    "month": "2026-07",
+    "url": "https://assets-netstorage.growwmf.in/compliance_docs/Statutory%20Disclosure/Portfolio/2026%20-2027/Monthly%20Portfolio-%20July%2031%202026.xlsx",
+    "sheet": "SC",
+    "unresolvedIdentifiers": {
+      "Lohia Corp Ltd": "INLOHIACORPL"
+    }
+  },
+  {
+    "fundId": "04",
+    "month": "2026-07",
+    "url": "https://www.motilaloswalmf.com/content/dam/motilal-mf/sheets/fund-csvs/Month_End_Portfolio_July_2026/YO46.xlsx",
+    "sheet": "YO46"
+  },
+  {
+    "fundId": "14",
+    "month": "2026-07",
+    "url": "https://media.bajajamc.com/wp-content/uploads/2026/08/Bajaj-Finserv-Mutual-Fund_Monthly-Portfolio-as-on-31-Jul-2026.xls",
+    "sheet": "BFSMALL"
+  },
+  {
+    "fundId": "16",
+    "month": "2026-07",
+    "url": "https://www.heliosmf.in/wp-content/uploads/2026/08/helios-small-cap-fund-monthly-portfolio-as-on-31st-july-2026.xlsx",
+    "sheet": "HSCF"
+  },
+  {
+    "fundId": "04",
+    "month": "2026-06",
+    "url": "https://www.motilaloswalmf.com/content/dam/motilal-mf/sheets/fund-csvs/Month_End_Portfolio_June_2026/YO46.xlsx",
+    "sheet": "YO46"
+  },
+  {
+    "fundId": "01",
+    "month": "2026-06",
+    "url": "https://mf.nipponindiaim.com/InvestorServices/FactsheetsDocuments/NIMF-MONTHLY-PORTFOLIO-30-Jun-26.xls",
+    "sheet": "SC"
+  },
+  {
+    "fundId": "17",
+    "month": "2026-06",
+    "url": "https://www.jmfinancialmf.com/CMS/downloads/Portfolio%20Disclosure/Monthly%20Portfolio%20of%20Schemes/Monthly%20Portfolio%20-%20JM%20Small%20Cap%20Fund%20-%20Jun%2030,%202026.xlsx",
+    "sheet": "JM Small Cap Fund"
+  },
+  {
+    "fundId": "07",
+    "month": "2026-06",
+    "url": "https://www.miraeassetmf.co.in/docs/default-source/portfolios/mascf-june2026.xlsx",
+    "sheet": "MASCF"
+  },
+  {
+    "fundId": "14",
+    "month": "2026-06",
+    "url": "https://media.bajajamc.com/wp-content/uploads/2026/07/Bajaj-Finserv-Mutual-Fund_Monthly-Portfolio-as-on-30-Jun-2026.xls",
+    "sheet": "BFSMALL"
+  },
+  {
+    "fundId": "02",
+    "month": "2026-06",
+    "url": "https://www.dspim.com/media/pages/mandatory-disclosures/portfolio-disclosures/ee5dc05630-1788276342/monthend-portfolios_30_june_2026.zip",
+    "sheet": "SMALLCAP",
+    "member": "DSP Equity FOF ISIN Portfolio as on 30 Jun 2026.xlsx"
+  },
+  {
+    "fundId": "03",
+    "month": "2026-06",
+    "url": "https://www.invescomutualfund.com/docs/default-source/completes-monthly-holding/invesco-india-smallcap-fund_jun_2026_equity.xlsx?sfvrsn=cc7a9cc2_0",
+    "sheet": "Smallcap"
+  },
+  {
+    "fundId": "13",
+    "url": "https://www.abakkusmf.com/uploads/Monthly_Portfolio_Jun26_30_Jun_65d7e26b0a.xls",
+    "sheet": "ABASC",
+    "month": "2026-06"
+  },
+  {
+    "fundId": "08",
+    "month": "2026-06",
+    "url": "https://www.mahindramanulife.com/uploads/download/fb46e09a-08bf-4c26-ba79-27fc95a6bbb2.xlsx",
+    "sheet": "MMF21",
+    "cashAggregate": {
+      "label": "Net Receivables / (Payables)",
+      "components": [
+        "Margin placed with CCIL & ARCL"
+      ]
+    }
+  },
+  {
+    "fundId": "18",
+    "url": "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/6/LEESCF08-07-2026-09:34:55.xlsx",
+    "sheet": "LEESCF",
+    "month": "2026-06"
+  },
+  {
+    "fundId": "20",
+    "month": "2026-06",
+    "url": "https://www.quantumamc.com/FileCDN/FactSheet/83d3ddb2-d731-4039-9884-8159ee1976ff.xlsx",
+    "sheet": "QSCAPF"
+  },
+  {
+    "fundId": "10",
+    "month": "2026-06",
+    "url": "https://www.sundarammutual.com/uploaddir/MonthlyPortfolio/monthlyportfolio_090726191301.xlsx",
+    "sheet": "SMILE",
+    "missingIsinNames": [
+      "GSPL Transmission Ltd"
+    ]
+  },
+  {
+    "fundId": "11",
+    "url": "https://itiamc.com/admin/pdf/1783684259-ITIMF_Monthly_portfolio_30.06.2026.xlsx",
+    "sheet": "ITISCF",
+    "month": "2026-06"
+  },
+  {
+    "fundId": "12",
+    "month": "2026-06",
+    "url": "https://trustmf.com/Content/2026/7/Copy%20of%20Mont_20260709122827.xlsx",
+    "sheet": "TMFSCAP"
+  },
+  {
+    "fundId": "15",
+    "url": "https://www.pgimindia.com/api/v1/brochure/about-us/image/PGIM%20INDIA%20SMALL%20CAP%20FUND%20June%202026.xlsx",
+    "sheet": "Small Cap",
+    "month": "2026-06"
+  },
+  {
+    "fundId": "19",
+    "month": "2026-06",
+    "url": "https://assets-netstorage.growwmf.in/compliance_docs/Statutory%20Disclosure/Portfolio/2026%20-2027/Monthly%20Portfolio-%20June%2030,%202026.xlsx",
+    "sheet": "IB60"
+  },
+  {
+    "fundId": "06",
+    "url": "https://mutualfund.adityabirlacapital.com/-/media/bsl/files/resources/monthly-portfolio/2026/monthly-portfolio-30-june-2026.zip",
+    "sheet": "BSLTA1",
+    "month": "2026-06",
+    "member": "30062026_ABSLMF_MonthlyDisclosure.xlsx"
+  },
+  {
+    "fundId": "16",
+    "month": "2026-06",
+    "url": "https://www.heliosmf.in/wp-content/uploads/2026/07/Helios-Small-Cap-Fund-Monthly-Portfolio-as-on-30th-June-2026.xlsx",
+    "sheet": "HSCF"
+  },
+  {
+    "fundId": "09",
+    "url": "https://d3ce1o48hc5oli.cloudfront.net/s3fs-public/2026-07/fw_uti_mf_scheme_portfolios_30.06.2026_rv1.zip?VersionId=oiqVXLqAaNYRLRE_zZAT0CTQbJ2.AjA_",
+    "sheet": "Sebi Exposure",
+    "layout": "uti-consolidated",
+    "month": "2026-06",
+    "member": "Sebi Exposure as on 30 Jun 2026_FINAL.xlsx"
+  },
+  {
+    "fundId": "05",
+    "month": "2026-06",
+    "url": "https://www.edelweissmf.com/Files/MF/Statutory/Portfolio_of_schemes/Monthly_Portfolio_and_RiskoMeter/EDEL_Portfolio_Monthly_Notes_30Jun2026_10072026123257.xlsx",
+    "sheet": "EEESCF"
+  },
+  {
+    "fundId": "05",
+    "month": "2026-07",
+    "sheet": "EEESCF",
+    "url": "https://www.edelweissmf.com/Files/MF/Statutory/Portfolio_of_schemes/Monthly_Portfolio_and_RiskoMeter/EDEL_Portfolio_Monthly_Notes_31Jul2026_10082026130139.xlsx"
+  },
+  {
+    "fundId": "05",
+    "month": "2026-08",
+    "sheet": "EEESCF",
+    "url": "https://www.edelweissmf.com/Files/MF/Statutory/Portfolio_of_schemes/Monthly_Portfolio_and_RiskoMeter/EDEL_Portfolio_Monthly_Notes_31Aug2026_Final_10092026113354.xlsx"
+  }
+]

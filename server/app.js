@@ -1,10 +1,14 @@
+import { createAIResearch } from "./ai-analysis.js";
+import { publicUpdate } from "./update-state.js";
+import { combinedAnalysis } from "./combined-analysis.js";
+import { createDisclosureUpdater } from "./disclosure-updater.js";
 import express from "express";
 import session from "express-session";
 import helmet from "helmet";
 import crypto from "node:crypto";
 import path from "node:path";
 import { createStore, FileSessions } from "./store.js";
-import { funds, previousMonth, topFive } from "./funds.js";
+import { funds, previousMonth, topHoldings } from "./funds.js";
 import { compare } from "./analysis.js";
 import { importSchema } from "./schema.js";
 import { createPostgresStorage } from "./postgres-store.js";
@@ -129,7 +133,12 @@ export function createApp(config) {
           .reverse(),
         allSaved = Object.values(d.snapshots).map((s) => s.month);
       res.json({
-        months: [...new Set([current, previousMonth(current), ...allSaved])]
+        months: [...new Set([
+          current,
+          previousMonth(current),
+          previousMonth(previousMonth(current)),
+          ...allSaved,
+        ])]
           .sort()
           .reverse(),
         defaultMonth: saved[0] || previousMonth(current),
@@ -153,14 +162,14 @@ export function createApp(config) {
         return {
           ...f,
           snapshot: s || null,
-          top: topFive(s).map((h) => {
-            const before = topFive(p).find((x) => x.companyId === h.companyId);
+          top: topHoldings(s).map((h) => {
+            const before = topHoldings(p).find((x) => x.companyId === h.companyId);
             return {
               ...h,
               allocationChange: before
                 ? h.allocation - before.allocation
                 : null,
-              newTopFive: !!p?.complete && !before,
+              newTop15: !!p?.complete && !before,
             };
           }),
           analysis: compare(p, s),
@@ -178,12 +187,15 @@ export function createApp(config) {
       res.json({
         month,
         funds: list,
+        combined: combinedAnalysis(list),
         ordering: ordered
           ? "Descending verified AUM; unavailable AUM follows. Not a quality ranking."
           : "Shortlist order · comparable verified AUM unavailable",
         aumDate: ordered ? aums[0].snapshot.aum.date : null,
         lastSuccessfulCheck: d.lastSuccessfulCheck,
         automaticUpdates: false,
+        storage: database ? "Neon Postgres" : "Local storage",
+        latestUpdate: d.updateRuns?.find((run) => run.month === month) || null,
       });
     }),
   );
@@ -199,6 +211,40 @@ export function createApp(config) {
       ),
     ),
   );
+  const aiResearch = createAIResearch(store);
+  app.post("/api/ai-analysis", auth, (_req, res) => res.status(405).json({ error: "Reports are prepared in the coding environment. This website only displays saved reports." }));
+  app.get("/api/ai-analysis", auth, wrap(async (req, res) => {
+    const month = req.query.month;
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month || "")) return res.status(400).json({ error: "Choose a valid reporting month." });
+    res.json({ run: await aiResearch.latest(month) });
+  }));
+  app.get("/api/ai-analysis/:id", auth, wrap(async (req, res) => {
+    const run = await aiResearch.get(req.params.id);
+    if (!run) return res.status(404).json({ error: "AI report not found." });
+    res.json(run);
+  }));
+  const disclosureUpdater = createDisclosureUpdater(store, { fetchSource: config.disclosureFetcher, catalog: config.sourceCatalog });
+  app.get("/api/updates", auth, wrap(async (req, res) => res.json(((await store.get()).updateRuns || []).map(publicUpdate))));
+  app.get("/api/updates/:id", auth, wrap(async (req, res) => {
+    const run = (await store.get()).updateRuns?.find((run) => run.id === req.params.id);
+    if (!run) return res.status(404).json({ error: "Update not found" });
+    res.json(publicUpdate(run));
+  }));
+  const startSourceUpdate = wrap(async (req, res) => {
+    const month = req.body?.month;
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month || "") || month > new Date().toISOString().slice(0, 7))
+      return res.status(400).json({ error: "Choose a valid reporting month that is not in the future." });
+    const result = await store.beginUpdate(month);
+    if (result.started) {
+      const task = disclosureUpdater.run(result.run).catch((error) => console.error("Disclosure update could not finish:", error.message));
+      config.defer?.(task);
+    }
+    res.status(202).json(result);
+  });
+  // Signed-in viewers can refresh the fixed official source catalog. Arbitrary
+  // snapshot imports and automated updater calls retain their separate key.
+  app.post("/api/portfolio/refresh", auth, startSourceUpdate);
+  app.post("/api/updater/sync", update, startSourceUpdate);
   const ingest = (batch, actor) => {
     const parsed = importSchema.parse(batch);
     return store.import(parsed, actor);

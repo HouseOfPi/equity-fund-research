@@ -12,8 +12,12 @@ Required deployment access: a Vercel CLI login or VERCEL_TOKEN injected into the
 4. Run `npx vercel --prod`. No cron is configured.
 5. Inspect build logs and verify the actual HTTPS URL. Confirm signed-out portfolio API returns 401, login sets a Secure/HttpOnly/SameSite=Strict cookie, viewer imports return 403, exact-month data is correct and sessions/snapshots survive another deployment.
 
-The database role must be allowed to create tables on first access. Runtime initialization creates `observatory_state` and `observatory_sessions`. Snapshot and history mutations lock the single state row in a transaction. Session cookies reference records shared across function instances; records expire after eight hours. Expired session cleanup should be configured separately by the database operator. No scheduler is claimed enabled.
+The database role must be allowed to create tables on first access. Runtime initialization creates state, sessions, fund/month snapshots, holdings, sources, and audit views. Snapshot and history mutations lock the single state row in a transaction. Session cookies reference records shared across function instances; records expire after eight hours. Expired session cleanup should be configured separately by the database operator. No scheduler is claimed enabled.
 
 The auth failure throttle remains per-function-instance; configure Vercel Firewall rate limiting before broad access. PostgreSQL TLS verification follows the provider's connection configuration; use the provider's TLS URL and do not disable certificate validation.
 
-The local build and existing tests pass. The remote database adapter, Vercel routing and deployed HTTPS flow require verification after credentials and hosting are configured. Do not describe this preparation as a live deployment.
+The local build and database integration tests can be run before deployment. Vercel routing and the deployed HTTPS flow require verification after hosting is configured. Do not describe this preparation as a live deployment.
+
+## Background source updates
+
+The serverless handler passes [`waitUntil`](https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package#waituntil) to the disclosure updater so work continues after the HTTP 202 response. `vercel.json` includes the source registry and database schema and sets `maxDuration` to 300 seconds. This remains bounded by the host invocation lifetime. Persisted heartbeats allow an interrupted run to be retried, with saved portfolios preserved. No hosted cron is enabled.

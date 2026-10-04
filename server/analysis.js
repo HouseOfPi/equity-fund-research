@@ -14,7 +14,9 @@ export function compare(previous, current) {
   const index = (s) => new Map(equity(s).map((h) => [h.companyId, h]));
   const a = index(previous),
     b = index(current);
-  const normalized = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  // Legal suffix variants are used only to flag identity changes for review.
+  // They never merge positions or establish purchases/exits.
+  const normalized = (name) => name.toLowerCase().replace(/\b(?:limited|ltd)\.?$/g, "").replace(/[^a-z0-9]/g, "");
   const ambiguous = new Set();
   for (const [id, p] of a)
     for (const [other, c] of b)

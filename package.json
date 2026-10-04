@@ -5,20 +5,28 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k \"node --watch server/index.js\" \"vite --host 0.0.0.0\"",
-    "build": "vite build",
+    "build": "NODE_ENV=production vite build",
     "start": "node server/index.js",
     "test": "node --test tests/*.test.js",
     "test:browser": "playwright test",
-    "setup": "node server/setup.js"
+    "setup": "node server/setup.js",
+    "db:migrate": "node server/migrate-db.js",
+    "db:check": "node server/check-db.js",
+    "data:sync": "node server/sync-disclosures.js",
+    "analysis:export": "node server/coding-analysis.js export",
+    "analysis:save": "node server/coding-analysis.js save"
   },
   "dependencies": {
+    "@vercel/functions": "^3.9.11",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "fflate": "^0.8.3",
     "helmet": "^8.0.0",
     "pg": "^8.23.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.24.2"
   },
   "devDependencies": {

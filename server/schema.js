@@ -20,6 +20,7 @@ const source = z
     retrievedAt: z.string().datetime(),
     result: z.enum(["agrees", "conflict", "not_checked"]),
     feed: z.string().optional(),
+    sha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
   })
   .strict();
 export const snapshotSchema = z
@@ -59,10 +60,11 @@ export const snapshotSchema = z
             "debt",
             "fund_unit",
           ]),
-          quantity: z.number().int().safe().nonnegative().nullable(),
-          allocation: z.number().min(0).max(100),
+          quantity: z.number().nonnegative().max(Number.MAX_SAFE_INTEGER).nullable(),
+          allocation: z.number().min(-100).max(100),
           reviewReason: z.string().min(1).optional(),
           identifierEvidence: z.string().optional(),
+          allocationEvidence: z.string().min(1).optional(),
           corporateAction: z.string().optional(),
         })
         .strict(),
@@ -93,6 +95,10 @@ export const snapshotSchema = z
       error("Unresolved conflict must be flagged");
     if (new Set(s.holdings.map((h) => h.companyId)).size !== s.holdings.length)
       error("Consolidate duplicate company IDs before import");
+    if (s.holdings.some((h) => h.allocation < 0 && h.instrument !== "cash"))
+      error("Only cash balances may have negative allocations (net payables)");
+    if (s.holdings.some((h) => h.instrument === "equity" && h.quantity !== null && !Number.isSafeInteger(h.quantity)))
+      error("Equity share quantities must be safe integers");
     if (s.holdings.some((h) => h.corporateAction && !h.reviewReason))
       error(
         "Corporate actions require a review reason; resolve and document evidence before comparison",

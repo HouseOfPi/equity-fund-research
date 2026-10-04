@@ -20,7 +20,7 @@ test("unreconciled identifier changes never assert purchases or sales", () => {
     holdings: [
       {
         companyId: "new",
-        company: "Example Limited",
+        company: "Example Ltd",
         instrument: "equity",
         quantity: 100,
         allocation: 3,

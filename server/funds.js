@@ -28,12 +28,14 @@ export function previousMonth(month) {
   const [y, m] = month.split("-").map(Number);
   return new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7);
 }
-export function topFive(snapshot) {
+export function topHoldings(snapshot, limit = 15) {
   return (snapshot?.holdings || [])
     .filter((h) => h.instrument === "equity")
     .sort(
       (a, b) =>
         b.allocation - a.allocation || a.company.localeCompare(b.company),
     )
-    .slice(0, 5);
+    .slice(0, limit);
 }
+
+export const topFive = (snapshot) => topHoldings(snapshot, 5);

@@ -1,3 +1,4 @@
+import { waitUntil } from "@vercel/functions";
 import { createApp } from "../server/app.js";
 const required = [
   "APP_PASSWORD",
@@ -24,6 +25,7 @@ export default function handler(req, res) {
       updaterToken: process.env.UPDATER_TOKEN,
       origin: process.env.APP_ORIGIN,
       secure: true,
+      defer: waitUntil,
       databaseUrl: process.env.DATABASE_URL,
       manifestUrl: process.env.DISCLOSURE_MANIFEST_URL,
     });

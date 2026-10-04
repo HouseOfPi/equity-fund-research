@@ -1,5 +1,9 @@
+import { beginAIReport, finishAIReport, saveCodingReport } from "./ai-analysis.js";
+import { applyImport, beginUpdate, progressUpdate, finishUpdate } from "./update-state.js";
 import pg from "pg";
 import session from "express-session";
+import { mergeLocalState } from "./database-migration.js";
+import { schemaSql, seedFunds, syncSnapshots } from "./postgres-projections.js";
 const initial = () => ({
   snapshots: {},
   history: [],
@@ -8,6 +12,7 @@ const initial = () => ({
 export function createPostgresStorage(connectionString) {
   const pool = new pg.Pool({
     connectionString,
+    enableChannelBinding: true,
     max: 3,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
@@ -15,21 +20,30 @@ export function createPostgresStorage(connectionString) {
   let initialization;
   const ready = () =>
     (initialization ??= (async () => {
-      await pool.query(
-        "CREATE TABLE IF NOT EXISTS observatory_state (id integer PRIMARY KEY CHECK(id=1), document jsonb NOT NULL)",
-      );
-      await pool.query(
-        "INSERT INTO observatory_state (id,document) VALUES (1,$1) ON CONFLICT DO NOTHING",
-        [JSON.stringify(initial())],
-      );
-      await pool.query(
-        "CREATE TABLE IF NOT EXISTS observatory_sessions (id text PRIMARY KEY, document jsonb NOT NULL, expires_at timestamptz NOT NULL)",
-      );
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query("SELECT pg_advisory_xact_lock(73102601)");
+        await client.query(schemaSql);
+        await client.query(
+          "INSERT INTO observatory_state (id,document) VALUES (1,$1) ON CONFLICT DO NOTHING",
+          [JSON.stringify(initial())],
+        );
+        await seedFunds(client);
+        const { rows } = await client.query("SELECT document FROM observatory_state WHERE id=1 FOR UPDATE");
+        await syncSnapshots(client, rows[0].document.snapshots);
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
     })().catch((e) => {
       initialization = null;
       throw e;
     }));
-  async function mutate(fn) {
+  async function mutate(fn, updateSnapshots = false) {
     await ready();
     const client = await pool.connect();
     try {
@@ -39,6 +53,7 @@ export function createPostgresStorage(connectionString) {
       );
       const data = rows[0].document,
         result = fn(data);
+      if (updateSnapshots) await syncSnapshots(client, data.snapshots);
       await client.query(
         "UPDATE observatory_state SET document=$1 WHERE id=1",
         [JSON.stringify(data)],
@@ -53,6 +68,9 @@ export function createPostgresStorage(connectionString) {
     }
   }
   const store = {
+    migrate(document) {
+      return mutate((data) => mergeLocalState(data, document), true);
+    },
     async get() {
       await ready();
       return (
@@ -70,33 +88,13 @@ export function createPostgresStorage(connectionString) {
         d.lastSuccessfulCheck = new Date().toISOString();
       });
     },
-    import(batch, actor) {
-      return mutate((d) => {
-        const changes = [];
-        for (const s of batch.snapshots) {
-          const key = s.month + ":" + s.fundId,
-            old = d.snapshots[key];
-          if (JSON.stringify(old) !== JSON.stringify(s))
-            changes.push({
-              fundId: s.fundId,
-              month: s.month,
-              action: old ? "replaced" : "added",
-              holdingsBefore: old?.holdings.length ?? null,
-              holdingsAfter: s.holdings.length,
-              previous: old || null,
-            });
-          d.snapshots[key] = s;
-        }
-        d.history.unshift({
-          at: new Date().toISOString(),
-          result: "success",
-          actor,
-          note: batch.note,
-          changes,
-        });
-        return changes;
-      });
-    },
+    import(batch, actor) { return mutate((data) => applyImport(data, batch, actor), true); },
+    saveCodingReport(envelope) { return mutate((data) => saveCodingReport(data, envelope)); },
+    beginAIReport(metadata) { return mutate((data) => beginAIReport(data, metadata)); },
+    finishAIReport(id, result) { return mutate((data) => finishAIReport(data, id, result)); },
+    beginUpdate(month) { return mutate((data) => beginUpdate(data, month)); },
+    progressUpdate(id, report) { return mutate((data) => progressUpdate(data, id, report)); },
+    finishUpdate(id, batch, report, error) { return mutate((data) => finishUpdate(data, id, batch, report, error), true); },
   };
   class PostgresSessions extends session.Store {
     get(id, cb) {
@@ -133,5 +131,18 @@ export function createPostgresStorage(connectionString) {
         );
     }
   }
-  return { store, sessions: new PostgresSessions(), close: () => pool.end() };
+  return {
+    store,
+    sessions: new PostgresSessions(),
+    async stats() {
+      await ready();
+      return (await pool.query(`SELECT
+        (SELECT count(*)::int FROM observatory_funds) AS funds,
+        (SELECT count(*)::int FROM observatory_snapshots) AS snapshots,
+        (SELECT count(*)::int FROM observatory_holdings) AS holdings,
+        (SELECT count(*)::int FROM observatory_sources) AS sources
+      `)).rows[0];
+    },
+    close: () => pool.end(),
+  };
 }
