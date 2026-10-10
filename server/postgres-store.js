@@ -17,6 +17,9 @@ export function createPostgresStorage(connectionString) {
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
   });
+  pool.on("error", (err) => {
+    console.warn("Postgres idle pool client error (handled):", err.message);
+  });
   let initialization;
   const ready = () =>
     (initialization ??= (async () => {
